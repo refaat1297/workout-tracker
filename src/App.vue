@@ -1,5 +1,10 @@
+<script setup>
+  import Navigation from "./components/Navigation.vue";
+</script>
+
 <template>
-  <div>
+  <div class="min-h-full font-Poppins box-border">
+    <Navigation />
     <router-view />
   </div>
 </template>
