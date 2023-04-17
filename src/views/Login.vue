@@ -1,13 +1,31 @@
 <script setup>
 
-import { ref } from 'vue'
+  import { ref } from 'vue'
+  import {supabase} from "@/supabase/init";
+  import {useRouter} from "vue-router";
 
 
+  const router = useRouter()
+  const email = ref(null)
+  const password = ref(null)
+  const errorMsg = ref(null)
 
-const email = ref(null)
-const password = ref(null)
-const errorMsg = ref(null)
 
+  async function login () {
+    try {
+      const {error} = await supabase.auth.signInWithPassword({
+        email: email.value,
+        password: password.value
+      })
+
+      if (error) throw error
+
+      await router.push({name: 'home'})
+    } catch (error) {
+      errorMsg.value = `Error: ${error.message}`
+      setTimeout(() => errorMsg.value = null, 5000)
+    }
+  }
 
 
 </script>
@@ -20,7 +38,7 @@ const errorMsg = ref(null)
     </div>
 
     <!--  Login Form  -->
-    <form class="p-8 flex flex-col bg-light-grey rounded-md shadow-lg">
+    <form @submit.prevent="login" class="p-8 flex flex-col bg-light-grey rounded-md shadow-lg">
       <h1 class="text-3xl text-at-light-green mb-4">Login</h1>
 
       <div class="flex flex-col mb-2">
