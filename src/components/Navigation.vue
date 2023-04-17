@@ -26,7 +26,7 @@
       <ul class="flex flex-1 justify-end gap-x-10">
         <router-link class="cursor-pointer" :to="{ name: 'home' }" tag="li">Home</router-link>
         <template v-if="user">
-          <router-link class="cursor-pointer" :to="{ name: '' }" tag="li">Create</router-link>
+          <router-link class="cursor-pointer" :to="{ name: 'create' }" tag="li">Create</router-link>
           <li class="cursor-pointer" @click="logout">Logout</li>
         </template>
         <router-link v-else class="cursor-pointer" :to="{ name: 'login' }" tag="li">Login</router-link>
