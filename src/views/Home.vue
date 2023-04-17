@@ -48,7 +48,7 @@
     <!--  Display Data  -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <router-link
-        :to="{ name: '' }"
+        :to="{ name: 'view-workout', params: { id: workout.id } }"
         v-for="workout in data" :key="workout.id"
         class="flex flex-col items-center bg-light-grey p-8 shadow-md cursor-pointer">
 
@@ -58,9 +58,9 @@
         <!--  Strength Training Image  -->
         <img v-else src="@/assets/images/dumbbell-light-green.png" class="h-24 w-auto" alt="">
 
-        <p class="mt-6 py-1 px-3 text-xs text-white bg-at-light-green shadow-md rounded-lg">{{ workout.type }}</p>
+        <p class="mt-6 py-1 px-3 text-xs text-white bg-at-light-green shadow-md rounded-lg capitalize">{{ workout.type }}</p>
 
-        <h1 class="mt-8 mb-2 text-center text-xl text-at-light-green">{{ workout.name }}</h1>
+        <h1 class="mt-8 mb-2 text-center text-xl text-at-light-green capitalize">{{ workout.name }}</h1>
       </router-link>
     </div>
   </div>
