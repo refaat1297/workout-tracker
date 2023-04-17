@@ -1,18 +1,75 @@
 <script setup>
 
   import {ref} from "vue";
+  import { uid } from "uid";
+  import {supabase} from "@/supabase/init.js";
 
 
   const workoutName = ref('')
   const workoutType = ref('select-workout')
-  const workoutExercises = ref([{
-    exercise: '',
-    sets: '',
-    reps: '',
-    weight: ''
-  }])
+  const workoutExercises = ref([])
   const statusMsg = ref(null)
   const errorMsg = ref(null)
+
+
+  function addExercise () {
+    if (workoutType.value === 'strength') {
+      workoutExercises.value.push({
+        id: uid(),
+        exercise: '',
+        sets: '',
+        pets: '',
+        weight: ''
+      })
+      return
+    }
+
+    workoutExercises.value.push({
+      id: uid(),
+      cardioType: '',
+      distance: '',
+      duration: '',
+      pace: ''
+    })
+  }
+
+  const workoutChange = () => {
+    workoutExercises.value = []
+    addExercise()
+  }
+
+  function deleteExercise (id) {
+    if (workoutExercises.value.length < 2) {
+      errorMsg.value = `Error: Can't remove, need to at least have one exercise`
+      setTimeout(() => errorMsg.value = null, 5000)
+    }
+    workoutExercises.value = workoutExercises.value.filter(el => el.id !== id)
+  }
+
+  async function createWorkout () {
+    try {
+      const {error} = await supabase
+          .from('workouts')
+          .insert([{
+            name: workoutName.value,
+            type: workoutType.value,
+            exercises: workoutExercises.value
+          }])
+
+      if (error) throw error
+
+      statusMsg.value = 'Success: Workout Created!'
+
+      workoutName.value = null
+      workoutType.value = 'select-workout'
+      workoutExercises.value = []
+
+      setTimeout(() => statusMsg.value = null, 5000)
+    } catch (error) {
+      errorMsg.value = `Error: ${error.message}`
+      setTimeout(() => errorMsg.value = null, 5000)
+    }
+  }
 
 
 
@@ -28,7 +85,7 @@
 
     <!--  Create Form  -->
     <div class="p-8 flex items-start bg-light-grey rounded-md shadow-lg">
-      <form class="flex flex-col gap-y-5 w-full">
+      <form @submit.prevent="createWorkout" class="flex flex-col gap-y-5 w-full">
         <h1 class="text-2xl text-at-light-green">Record Workout</h1>
 
         <!--  Workout Name  -->
@@ -40,7 +97,7 @@
         <!--  Workout Type  -->
         <div class="flex flex-col">
           <label for="workout-type" class="mb-1 text-sm text-at-light-green">Workout Type:</label>
-          <select v-model="workoutType" id="workout-type" class="p-2 text-gray-500 focus:outline-none" required>
+          <select v-model="workoutType" @change="workoutChange" id="workout-type" class="p-2 text-gray-500 focus:outline-none" required>
             <option value="select-workout">Select Workout</option>
             <option value="strength">Strength Training</option>
             <option value="cardio">Cardio</option>
@@ -49,7 +106,7 @@
 
         <!--  Strength Training Inputs  -->
         <div v-if="workoutType === 'strength'" class="flex flex-col gap-y-4">
-          <div v-for="(item, index) in workoutExercises" :key="index" class="flex flex-col gap-x-6 gap-y-2 relative md:flex-row">
+          <div v-for="item in workoutExercises" :key="item.id" class="flex flex-col gap-x-6 gap-y-2 relative md:flex-row">
             <div class="flex flex-col md:w-1/3">
               <label for="exercise-name" class="mb-1 text-sm text-at-light-green">Exercise:</label>
               <input v-model="item.exercise" type="text" class="p-2 w-full text-gray-500 focus:outline-none" required>
@@ -70,10 +127,11 @@
               <input v-model="item.weight" type="text" class="p-2 w-full text-gray-500 focus:outline-none" required>
             </div>
 
-            <img src="@/assets/images/trash-light-green.png" class="h-4 w-auto absolute -left-5 cursor-pointer" alt="">
+            <img @click="deleteExercise(item.id)" src="@/assets/images/trash-light-green.png" class="h-4 w-auto absolute -left-5 cursor-pointer" alt="">
           </div>
 
           <button
+              @click="addExercise"
               type="button"
               class="
                   mt-6 py-2 px-6 rounded-sm self-start text-sm text-white
@@ -83,7 +141,7 @@
 
         <!--  Cardio Inputs  -->
         <div v-if="workoutType === 'cardio'" class="flex flex-col gap-y-4">
-          <div v-for="(item, index) in workoutExercises" :key="index" class="flex flex-col gap-x-6 gap-y-2 relative md:flex-row">
+          <div v-for="item in workoutExercises" :key="item.id" class="flex flex-col gap-x-6 gap-y-2 relative md:flex-row">
             <div class="flex flex-col md:w-1/3">
               <label for="cardio-type" class="mb-1 text-sm text-at-light-green">Type:</label>
               <select v-model="item.cardioType" id="cardio-type" class="p-2 w-full text-gray-500 focus:outline-none">
@@ -108,10 +166,11 @@
               <input v-model="item.pace" type="text" class="p-2 w-full text-gray-500 focus:outline-none" required>
             </div>
 
-            <img src="@/assets/images/trash-light-green.png" class="h-4 w-auto absolute -left-5 cursor-pointer" alt="">
+            <img @click="deleteExercise(item.id)" src="@/assets/images/trash-light-green.png" class="h-4 w-auto absolute -left-5 cursor-pointer" alt="">
           </div>
 
           <button
+              @click="addExercise"
               type="button"
               class="
                   mt-6 py-2 px-6 rounded-sm self-start text-sm text-white
