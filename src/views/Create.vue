@@ -42,6 +42,7 @@
     if (workoutExercises.value.length < 2) {
       errorMsg.value = `Error: Can't remove, need to at least have one exercise`
       setTimeout(() => errorMsg.value = null, 5000)
+      return
     }
     workoutExercises.value = workoutExercises.value.filter(el => el.id !== id)
   }
